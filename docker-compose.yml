@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  device_db:
+    image: postgres:18.0-alpine3.22
+    environment:
+      POSTGRES_DB: device
+      POSTGRES_USER: device_user
+      POSTGRES_PASSWORD: device_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  device_app:
+    build: .
+    depends_on:
+      - device_db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://device_db:5432/device
+      SPRING_DATASOURCE_USERNAME: device_user
+      SPRING_DATASOURCE_PASSWORD: device_pass
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
