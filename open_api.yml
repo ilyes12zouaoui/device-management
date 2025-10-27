@@ -1,0 +1,364 @@
+openapi: 3.0.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /api/v1/devices/{id}:
+    get:
+      tags:
+        - device-resource
+      summary: Get a device by its ID
+      operationId: getById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Device found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DeviceDto'
+        '404':
+          description: Device not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    put:
+      tags:
+        - device-resource
+      summary: Update a device by its ID
+      operationId: update
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdateDto'
+        required: true
+      responses:
+        '200':
+          description: Device updated
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DeviceDto'
+        '400':
+          description: Validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        '404':
+          description: Device not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    delete:
+      tags:
+        - device-resource
+      summary: Delete a device by its ID
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Device deleted
+        '404':
+          description: Device not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    patch:
+      tags:
+        - device-resource
+      summary: Partially update a device by its ID
+      operationId: patch
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevicePatchDto'
+        required: true
+      responses:
+        '200':
+          description: Device patched
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DeviceDto'
+        '400':
+          description: Validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+        '404':
+          description: Device not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+  /api/v1/devices:
+    get:
+      tags:
+        - device-resource
+      summary: Find devices by brand or name (paginated)
+      operationId: findByBrandOrName
+      parameters:
+        - name: brand
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: pageable
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+      responses:
+        '200':
+          description: Devices found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Page'
+        '400':
+          description: Invalid request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    post:
+      tags:
+        - device-resource
+      summary: Create a new device
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreationDto'
+        required: true
+      responses:
+        '200':
+          description: Device created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DeviceDto'
+        '400':
+          description: Validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+components:
+  schemas:
+    DeviceUpdateDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Smartphone
+        brand:
+          type: string
+          example: SmartphoneBrand
+        deviceState:
+          type: string
+          enum:
+            - AVAILABLE
+            - IN_USE
+            - INACTIVE
+          example: INACTIVE
+      required:
+        - brand
+        - deviceState
+        - name
+    DeviceDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: Smartphone
+        brand:
+          type: string
+          example: SmartphoneBrand
+        deviceState:
+          type: string
+          enum:
+            - AVAILABLE
+            - IN_USE
+            - INACTIVE
+          example: AVAILABLE
+        creationTime:
+          type: string
+          format: date-time
+          example: '2025-10-26T18:06:06.752Z'
+    ErrorResponseDto:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+          example: Name and brand cannot be updated while the deviceStatus is IN_USE.
+        errorCode:
+          type: string
+          example: IDU-001
+        errorType:
+          type: string
+          example: INVALID_DEVICE_UPDATE
+        correlationId:
+          type: string
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+    DeviceCreationDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Smartphone
+        brand:
+          type: string
+          example: SmartphoneBrand
+        deviceState:
+          type: string
+          enum:
+            - AVAILABLE
+            - IN_USE
+            - INACTIVE
+          example: AVAILABLE
+        creationTime:
+          type: string
+          format: date-time
+          example: '2025-10-26T18:06:06.752Z'
+      required:
+        - brand
+        - creationTime
+        - deviceState
+        - name
+    DevicePatchDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Smartphone
+        brand:
+          type: string
+          example: SmartphoneBrand
+        deviceState:
+          type: string
+          enum:
+            - AVAILABLE
+            - IN_USE
+            - INACTIVE
+          example: INACTIVE
+    Pageable:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+          minimum: 0
+        size:
+          type: integer
+          format: int32
+          minimum: 1
+        sort:
+          type: array
+          items:
+            type: string
+    Page:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            type: object
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        paged:
+          type: boolean
+        pageSize:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
