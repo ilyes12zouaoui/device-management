@@ -1,0 +1,25 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+  application:
+    name: device
+  datasource:
+    url: jdbc:postgresql://localhost:5433/device
+    username: device_user
+    password: device_pass
+  flyway:
+    url: jdbc:postgresql://localhost:5433/device
+    user: device_user
+    password: device_pass
+logging:
+  structured:
+    format:
+      console: ecs
+springdoc:
+  api-docs:
+    path: /api/open-api
+  swagger-ui:
+    path: /api/open-api-ui.html
+server:
+  port: 8080
